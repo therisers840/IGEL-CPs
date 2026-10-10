@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101426">
+  <title>InstaLookup AI</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #0b1020;
+      color: #edf2ff;
+      font-family: system-ui, Arial, sans-serif;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 16px 18px;
+    }
+
+    .logo {
+      display: inline-block;
+      padding: 7px 13px;
+      border: 1px solid #45426f;
+      border-radius: 25px;
+      background: #222748;
+      color: #d9d0ff;
+      font-size: 12px;
+    }
+
+    h1 { margin: 14px 0 7px; font-size: 30px; }
+    h1 span { color: #a99aff; }
+
+    p {
+      color: #aab6cf;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    main { max-width: 760px; margin: auto; padding: 12px; }
+
+    .card {
+      background: #151e33;
+      border: 1px solid #303c57;
+      border-radius: 17px;
+      padding: 18px;
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #35415d;
+      background: #0b1325;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px;
+      border: 0;
+      border-radius: 10px;
+      background: #a99aff;
+      color: #141027;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: #27324b;
+      color: #edf2ff;
+      border: 1px solid #414d69;
+    }
+
+    .notice {
+      border-left: 3px solid #a99aff;
+      padding: 10px;
+      background: #202943;
+      border-radius: 5px;
+    }
+
+    #searchArea {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      background: white;
+      color: #111;
+      min-height: 100px;
+      overflow: hidden;
+    }
+
+    #searchArea p { color: #555; }
+
+    #status { overflow-wrap: anywhere; }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #8e9bb5;
+      font-size: 12px;
+    }
+  </style>
+
+  <!-- Google Programmable Search Engine -->
+  <script async src="https://cse.google.com/cse.js?cx=b5b0c8fa1fb1a4480"></script>
+</head>
+
+<body>
+  <header>
+    <div class="logo">🛡️ PUBLIC WEB SEARCH</div>
+    <h1>InstaLookup <span>AI</span></h1>
+    <p>Explore publicly indexed information associated with a username.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Search a username</h2>
+      <p>
+        Enter a username to prepare a public web search.
+        Results are supplied by Google, not retrieved from private Instagram data.
+      </p>
+
+      <form id="lookupForm">
+        <input
+          id="username"
+          type="text"
+          maxlength="150"
+          placeholder="Enter username, e.g. demo_creator"
+          autocomplete="off"
+          required
+        >
+        <button type="submit">Search Public Information</button>
+      </form>
+
+      <button class="secondary" id="openGoogle" type="button">
+        Open Results on Google
+      </button>
+
+      <p id="status" aria-live="polite">
+        Ready. Enter a username to begin.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Google Search Results</h2>
+      <div class="notice">
+        <p>
+          These are public web search results. A matching username does not
+          prove that a page belongs to the same person.
+        </p>
+      </div>
+
+      <div id="searchArea">
+        <div class="gcse-search"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>What this app can do</h2>
+      <p>✓ Search web pages indexed by Google.</p>
+      <p>✓ Help locate publicly published creator or business contact details.</p>
+      <p>✓ Let you inspect results and decide whether they are relevant.</p>
+
+      <h3>What it cannot do</h3>
+      <p>✗ Reveal hidden email addresses or private phone numbers.</p>
+      <p>✗ Access passwords, private messages, or restricted account data.</p>
+      <p>✗ Guarantee that a search result belongs to the username entered.</p>
+    </section>
+  </main>
+
+  <footer>
+    InstaLookup AI · Public information only · Educational use
+  </footer>
+
+  <script>
+    (() => {
+      const form = document.getElementById("lookupForm");
+      const field = document.getElementById("username");
+      const status = document.getElementById("status");
+      const openGoogle = document.getElementById("openGoogle");
+
+      function getQuery() {
+        const value = field.value.trim().replace(/^@+/, "");
+
+        if (!value) {
+          status.textContent = "Please enter a username first.";
+          field.focus();
+          return null;
+        }
+
+        if (value.length > 150) {
+          status.textContent = "Please enter a shorter search term.";
+          return null;
+        }
+
+        return '"' + value.replace(/["\\]/g, "") + '"';
+      }
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const query = getQuery();
+        if (!query) return;
+
+        const searchInput = document.querySelector(
+          ".gsc-input-box input, input.gsc-input"
+        );
+
+        const searchButton = document.querySelector(
+          ".gsc-search-button"
+        );
+
+        if (searchInput && searchButton) {
+          searchInput.value = query;
+          searchInput.dispatchEvent(
+            new Event("input", { bubbles: true })
+          );
+          searchButton.click();
+          status.textContent =
+            "Search submitted. Check the Google results below.";
+        } else {
+          status.textContent =
+            "The Google search box is loading. You can open results directly.";
+          window.open(
+            "https://www.google.com/search?q=" +
+              encodeURIComponent(query),
+            "_blank",
+            "noopener"
+          );
+        }
+      });
+
+      openGoogle.addEventListener("click", () => {
+        const query = getQuery();
+        if (!query) return;
+
+        window.open(
+          "https://www.google.com/search?q=" +
+            encodeURIComponent(query),
+          "_blank",
+          "noopener"
+        );
+
+        status.textContent = "Opened a Google public web search.";
+      });
+    })();
+  </script>
+</body>
+</html>
